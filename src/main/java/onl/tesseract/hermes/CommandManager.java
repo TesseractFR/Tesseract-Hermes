@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -13,6 +15,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class CommandManager extends ListenerAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(CommandManager.class);
 
     private final Collection<DiscordCommand> commands;
     private final Guild guild;
@@ -26,6 +30,10 @@ public class CommandManager extends ListenerAdapter {
     @Override
     public void onSlashCommand(@NotNull final SlashCommandEvent event)
     {
+        if (event.getGuild() == null)
+            return;
+        //noinspection ConstantConditions
+        logger.info("Member {} executed command {}", event.getMember().getNickname(), event.getName());
         commands.stream()
                 .filter(command -> command.name().equals(event.getName()))
                 .findAny()

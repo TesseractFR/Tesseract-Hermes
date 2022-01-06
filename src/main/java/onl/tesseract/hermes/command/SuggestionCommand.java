@@ -7,6 +7,7 @@ import onl.tesseract.hermes.DiscordCommand;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class SuggestionCommand implements DiscordCommand {
@@ -25,7 +26,12 @@ public class SuggestionCommand implements DiscordCommand {
     @Override
     public void execute(final SlashCommandEvent event)
     {
-
+        event.deferReply().queue();
+        String title = Objects.requireNonNull(event.getOption("titre")).getAsString();
+        String description = Objects.requireNonNull(event.getOption("description")).getAsString();
+        event.getHook()
+             .sendMessage("test")
+             .queue();
     }
 
     @Override

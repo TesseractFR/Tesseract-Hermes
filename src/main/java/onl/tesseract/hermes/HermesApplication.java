@@ -34,7 +34,10 @@ public class HermesApplication {
     }
 
     @Bean
-    public CommandLineRunner registerCommands(CommandManager commandManager) {
-        return args -> commandManager.registerCommands();
+    public CommandLineRunner registerCommands(CommandManager commandManager, JDA jda) {
+        return args -> {
+            jda.addEventListener(commandManager);
+            commandManager.registerCommands();
+        };
     }
 }
