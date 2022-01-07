@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +19,15 @@ public class CommandManager extends ListenerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandManager.class);
 
-    private final Collection<DiscordCommand> commands;
+    private final Collection<DiscordRootCommand> commands;
+    private final Collection<DiscordSubCommand> subCommands;
     private final Guild guild;
 
-    CommandManager(final Collection<DiscordCommand> commands, final Guild guild)
+    CommandManager(final Collection<DiscordRootCommand> commands, final Collection<DiscordSubCommand> subCommands,
+                   final Guild guild)
     {
         this.commands = commands;
+        this.subCommands = subCommands;
         this.guild = guild;
     }
 
@@ -44,10 +48,23 @@ public class CommandManager extends ListenerAdapter {
     {
         List<CommandData> datas = commands.stream()
                                           .map(command -> new CommandData(command.name(), command.description())
-                                                  .addOptions(command.options()))
+                                                  .addOptions(command.options())
+                                                  .addSubcommands(getSubCommands(command.getClass())
+                                                          .stream()
+                                                          .map(subCommand -> new SubcommandData(subCommand.name(), subCommand.description())
+                                                                  .addOptions(subCommand.options()))
+                                                          .collect(Collectors.toList()))
+                                          )
                                           .collect(Collectors.toList());
         guild.updateCommands()
              .addCommands(datas)
              .queue();
+    }
+
+    public Collection<DiscordSubCommand> getSubCommands(final Class<? extends DiscordRootCommand> command)
+    {
+        return subCommands.stream()
+                          .filter(command::isInstance)
+                          .collect(Collectors.toList());
     }
 }
