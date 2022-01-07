@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -47,14 +48,19 @@ public class CommandManager extends ListenerAdapter {
     public void registerCommands()
     {
         List<CommandData> datas = commands.stream()
-                                          .map(command -> new CommandData(command.name(), command.description())
-                                                  .addOptions(command.options())
-                                                  .addSubcommands(getSubCommands(command.getClass())
+                                          .map(command -> {
+                                              CommandData commandData = new CommandData(command.name(), command.description());
+                                              List<OptionData> options = command.options();
+                                              if (!options.isEmpty())
+                                                  commandData.addOptions(options);
+                                              else
+                                                  commandData.addSubcommands(getSubCommands(command.getClass())
                                                           .stream()
                                                           .map(subCommand -> new SubcommandData(subCommand.name(), subCommand.description())
                                                                   .addOptions(subCommand.options()))
-                                                          .collect(Collectors.toList()))
-                                          )
+                                                          .collect(Collectors.toList()));
+                                              return commandData;
+                                          })
                                           .collect(Collectors.toList());
         guild.updateCommands()
              .addCommands(datas)
@@ -64,7 +70,7 @@ public class CommandManager extends ListenerAdapter {
     public Collection<DiscordSubCommand> getSubCommands(final Class<? extends DiscordRootCommand> command)
     {
         return subCommands.stream()
-                          .filter(command::isInstance)
+                          .filter(subCommand -> subCommand.getParentCommand().equals(command))
                           .collect(Collectors.toList());
     }
 }
