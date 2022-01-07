@@ -3,6 +3,7 @@ package onl.tesseract.hermes.command;
 import com.julienvey.trello.domain.Board;
 import com.julienvey.trello.domain.TList;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -57,10 +58,13 @@ public class SuggestionCommand implements DiscordCommand {
                                                        .build();
 
         suggestion.submit();
+        MessageEmbed reply = computeEmbedMessage(suggestion);
 
-        event.getHook()
-             .sendMessageEmbeds(computeEmbedMessage(suggestion))
-             .queue();
+        Message sentReply = event.getHook()
+                                .sendMessageEmbeds(reply)
+                                .complete();
+
+        suggestion.setResponseMessage(sentReply);
     }
 
     private MessageEmbed computeEmbedMessage(final Suggestion suggestion)

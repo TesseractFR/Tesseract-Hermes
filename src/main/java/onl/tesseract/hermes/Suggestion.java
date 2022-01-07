@@ -4,6 +4,7 @@ import com.julienvey.trello.domain.Card;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import onl.tesseract.hermes.suggestion.TrelloList;
+import org.springframework.lang.Nullable;
 
 import java.util.Objects;
 
@@ -11,7 +12,7 @@ public final class Suggestion {
     private final String title;
     private final String description;
     private final Member discordMember;
-    private final Message responseMessage;
+    private Message responseMessage;
     private Card trelloCard;
 
     public Suggestion(String title, String description, Member discordMember,
@@ -26,7 +27,34 @@ public final class Suggestion {
 
     public void submit()
     {
-        this.trelloCard = TrelloList.SUGGESTIONS.getList().createCard(this.trelloCard);
+        Card card = new Card();
+        card.setName(title);
+        card.setDesc(buildDescription());
+        this.trelloCard = TrelloList.SUGGESTIONS.getList().createCard(card);
+    }
+
+    private String buildDescription()
+    {
+        String content = "Auteur : "
+                + discordMember.getUser().getAsTag();
+        if (responseMessage != null)
+            content += "\nRéponse : " + responseMessage.getId()
+                    + "\nLien de la réponse : " + responseMessage.getJumpUrl();
+        content += "\n\n"
+                + description;
+        return content;
+    }
+
+    public void updateTrelloCard()
+    {
+        this.trelloCard.setDesc(buildDescription());
+        this.trelloCard = this.trelloCard.update();
+    }
+
+    public void setResponseMessage(final Message responseMessage)
+    {
+        this.responseMessage = responseMessage;
+        updateTrelloCard();
     }
 
     public String getTitle()
@@ -44,6 +72,7 @@ public final class Suggestion {
         return discordMember;
     }
 
+    @Nullable
     public Message getResponseMessage()
     {
         return responseMessage;
