@@ -73,7 +73,7 @@ public class SuggestionCommand implements DiscordCommand {
         embedBuilder.setTitle(suggestion.getTitle())
                     .setColor(new Color(52, 152, 219))
                     .setFooter("Proposé par " + suggestion.getDiscordMember().getUser().getAsTag())
-                    .addField("État", "En attente", false)
+                    .addField("État", suggestion.getStatus().getDesc(), false)
                     .addField("Trello id", suggestion.getTrelloCard().getShortLink(), false)
                     .addField("Trello url", suggestion.getTrelloCard().getShortUrl(), false)
                     .setDescription(suggestion.getDescription());

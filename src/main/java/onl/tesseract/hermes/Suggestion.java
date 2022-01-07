@@ -3,6 +3,7 @@ package onl.tesseract.hermes;
 import com.julienvey.trello.domain.Card;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import onl.tesseract.hermes.suggestion.SuggestionStatus;
 import onl.tesseract.hermes.suggestion.TrelloList;
 import org.springframework.lang.Nullable;
 
@@ -14,10 +15,12 @@ public final class Suggestion {
     private final Member discordMember;
     private Message responseMessage;
     private Card trelloCard;
+    private SuggestionStatus status;
 
     public Suggestion(String title, String description, Member discordMember,
                       Message responseMessage, Card trelloCard)
     {
+        this.status = SuggestionStatus.CREATED;
         this.title = title;
         this.description = description;
         this.discordMember = discordMember;
@@ -31,6 +34,7 @@ public final class Suggestion {
         card.setName(title);
         card.setDesc(buildDescription());
         this.trelloCard = TrelloList.SUGGESTIONS.getList().createCard(card);
+        this.status = SuggestionStatus.PENDING;
     }
 
     private String buildDescription()
@@ -55,6 +59,11 @@ public final class Suggestion {
     {
         this.responseMessage = responseMessage;
         updateTrelloCard();
+    }
+
+    public SuggestionStatus getStatus()
+    {
+        return status;
     }
 
     public String getTitle()
