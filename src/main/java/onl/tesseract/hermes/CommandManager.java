@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -42,6 +43,14 @@ public class CommandManager extends ListenerAdapter {
         commands.stream()
                 .filter(command -> command.name().equals(event.getName()))
                 .findAny()
+                .flatMap(command -> {
+                    if (event.getSubcommandName() == null)
+                        return Optional.of(command);
+                    return getSubCommands(command.getClass())
+                            .stream()
+                            .filter(subCommand -> subCommand.name().equals(event.getSubcommandName()))
+                            .findAny();
+                })
                 .ifPresent(command -> command.execute(event));
     }
 
