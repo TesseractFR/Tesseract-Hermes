@@ -1,12 +1,13 @@
 package onl.tesseract.hermes.command;
 
 import com.julienvey.trello.domain.Board;
-import com.julienvey.trello.domain.Card;
 import com.julienvey.trello.domain.TList;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import onl.tesseract.hermes.DiscordCommand;
+import onl.tesseract.hermes.Suggestion;
+import onl.tesseract.hermes.SuggestionBuilder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -47,19 +48,16 @@ public class SuggestionCommand implements DiscordCommand {
         String title = Objects.requireNonNull(event.getOption("titre")).getAsString();
         String description = Objects.requireNonNull(event.getOption("description")).getAsString();
 
-        Card created = createCard(title, description);
+        Suggestion suggestion = new SuggestionBuilder().setTitle(title)
+                                                       .setDescription(description)
+                                                       .setDiscordMember(event.getMember())
+                                                       .build();
+
+        suggestion.submit();
 
         event.getHook()
-             .sendMessage(created.getShortUrl())
+             .sendMessage(suggestion.getTrelloCard().getShortUrl())
              .queue();
-    }
-
-    private Card createCard(final String title, final String description)
-    {
-        Card card = new Card();
-        card.setName(title);
-        card.setDesc(description);
-        return newSuggestionsList.createCard(card);
     }
 
     @Override

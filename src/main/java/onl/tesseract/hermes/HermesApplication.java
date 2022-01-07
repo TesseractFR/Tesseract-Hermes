@@ -22,6 +22,8 @@ public class HermesApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(HermesApplication.class);
 
+    public static Board trelloBoard;
+
     public static void main(String[] args)
     {
         SpringApplication.run(HermesApplication.class, args);
@@ -36,7 +38,8 @@ public class HermesApplication {
     @Bean
     public Board trelloBoard(@Value("${trello.boardId}") final String boardId, Trello trello)
     {
-        return trello.getBoard(boardId);
+        trelloBoard = trello.getBoard(boardId);
+        return trelloBoard;
     }
 
     @Bean
