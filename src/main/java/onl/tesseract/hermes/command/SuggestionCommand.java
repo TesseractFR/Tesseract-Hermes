@@ -2,6 +2,8 @@ package onl.tesseract.hermes.command;
 
 import com.julienvey.trello.domain.Board;
 import com.julienvey.trello.domain.TList;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -10,6 +12,7 @@ import onl.tesseract.hermes.Suggestion;
 import onl.tesseract.hermes.SuggestionBuilder;
 import org.springframework.stereotype.Component;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,8 +59,22 @@ public class SuggestionCommand implements DiscordCommand {
         suggestion.submit();
 
         event.getHook()
-             .sendMessage(suggestion.getTrelloCard().getShortUrl())
+             .sendMessageEmbeds(computeEmbedMessage(suggestion))
              .queue();
+    }
+
+    private MessageEmbed computeEmbedMessage(final Suggestion suggestion)
+    {
+        final EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setTitle(suggestion.getTitle())
+                    .setColor(new Color(52, 152, 219))
+                    .setFooter("Proposé par " + suggestion.getDiscordMember().getUser().getAsTag())
+                    .addField("État", "En attente", false)
+                    .addField("Trello id", suggestion.getTrelloCard().getShortLink(), false)
+                    .addField("Trello url", suggestion.getTrelloCard().getShortUrl(), false)
+                    .setDescription(suggestion.getDescription());
+
+        return embedBuilder.build();
     }
 
     @Override
