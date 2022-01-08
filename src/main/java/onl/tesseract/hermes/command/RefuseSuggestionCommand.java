@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import onl.tesseract.hermes.DiscordRootCommand;
 import onl.tesseract.hermes.DiscordSubCommand;
 import onl.tesseract.hermes.HermesApplication;
+import onl.tesseract.hermes.Suggestion;
 import onl.tesseract.hermes.exception.SuggestionParsingException;
 import onl.tesseract.hermes.suggestion.SuggestionCardParser;
 import onl.tesseract.hermes.suggestion.SuggestionStatus;
@@ -64,8 +65,7 @@ public class RefuseSuggestionCommand implements DiscordSubCommand {
                              }
                          })
                          .ifPresentOrElse(suggestion -> {
-                             suggestion.setStatus(SuggestionStatus.REFUSED);
-                             suggestion.updateDiscordMessage();
+                             refuse(suggestion);
                              event.getHook().sendMessage(":thumbsup:")
                                   .queue();
                          }, () -> event.getHook()
@@ -74,6 +74,15 @@ public class RefuseSuggestionCommand implements DiscordSubCommand {
                                        .flatMap(Message::delete)
                                        .queue());
 
+    }
+
+    private void refuse(final Suggestion suggestion)
+    {
+        suggestion.setStatus(SuggestionStatus.REFUSED);
+        suggestion.updateDiscordMessage();
+        suggestion.getTrelloCard().setClosed(true);
+        suggestion.getTrelloCard().update();
+        logger.info("Suggestion {} refused. Trello card closed.", suggestion.getTrelloCard().getShortLink());
     }
 
     @Override
