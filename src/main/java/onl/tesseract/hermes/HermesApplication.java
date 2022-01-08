@@ -7,6 +7,7 @@ import com.julienvey.trello.impl.http.ApacheHttpClient;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import javax.security.auth.login.LoginException;
+import java.util.Objects;
 
 @SpringBootApplication
 public class HermesApplication {
@@ -40,6 +42,11 @@ public class HermesApplication {
     {
         trelloBoard = trello.getBoard(boardId);
         return trelloBoard;
+    }
+
+    @Bean
+    public TextChannel suggestionChannel(@Value("${discord.channel.id}") final String suggestionChannelId, final Guild guild) {
+        return Objects.requireNonNull(guild.getTextChannelById(suggestionChannelId));
     }
 
     @Bean
