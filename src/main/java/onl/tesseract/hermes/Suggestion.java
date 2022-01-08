@@ -4,6 +4,7 @@ import com.julienvey.trello.domain.Card;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import onl.tesseract.hermes.command.SuggestionUtils;
+import onl.tesseract.hermes.suggestion.SuggestionApprovalType;
 import onl.tesseract.hermes.suggestion.SuggestionStatus;
 import onl.tesseract.hermes.suggestion.TrelloList;
 import org.springframework.lang.Nullable;
@@ -18,7 +19,7 @@ public final class Suggestion {
     private Card trelloCard;
     private SuggestionStatus status;
 
-    private String refusalReason;
+    private String statusMessage;
 
     public Suggestion(String title, String description, Member discordMember,
                       Message responseMessage, Card trelloCard)
@@ -69,12 +70,22 @@ public final class Suggestion {
 
     public void refuse(final String reason)
     {
-        this.refusalReason = reason;
+        this.statusMessage = reason;
         setStatus(SuggestionStatus.REFUSED);
         updateDiscordMessage();
         getTrelloCard().setClosed(true);
-        getTrelloCard().update();
         getTrelloCard().addComment("Refusée : " + reason);
+        getTrelloCard().update();
+    }
+
+    public void accept(final SuggestionApprovalType approvalType, @Nullable final String message)
+    {
+        this.statusMessage = message;
+        setStatus(SuggestionStatus.APPROVED);
+        updateDiscordMessage();
+        trelloCard.setIdList(approvalType.getTrelloList().getList().getId());
+        trelloCard.addComment("Acceptée : " + message);
+        trelloCard.update();
     }
 
     public void setResponseMessage(final Message responseMessage)
@@ -119,9 +130,9 @@ public final class Suggestion {
         return trelloCard;
     }
 
-    public String getRefusalReason()
+    public String getStatusMessage()
     {
-        return refusalReason;
+        return statusMessage;
     }
 
     @Override

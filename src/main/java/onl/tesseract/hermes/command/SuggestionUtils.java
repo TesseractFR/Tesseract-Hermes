@@ -15,8 +15,11 @@ public class SuggestionUtils {
                     .setFooter("Proposé par " + suggestion.getDiscordMember().getUser().getAsTag())
                     .addField("État", suggestion.getStatus().getDesc(), false);
 
-        if (suggestion.getStatus() == SuggestionStatus.REFUSED && suggestion.getRefusalReason() != null)
-            embedBuilder.addField("Raison du refus", suggestion.getRefusalReason(), false);
+        if (suggestion.getStatus() == SuggestionStatus.REFUSED && suggestion.getStatusMessage() != null)
+            embedBuilder.addField("Raison du refus", suggestion.getStatusMessage(), false);
+
+        if (suggestion.getStatus() == SuggestionStatus.APPROVED && suggestion.getStatusMessage() != null)
+            embedBuilder.addField("Information supplémentaire", suggestion.getStatusMessage(), false);
 
         embedBuilder.addField("Trello id", suggestion.getTrelloCard().getShortLink(), false)
                     .addField("Trello url", suggestion.getTrelloCard().getShortUrl(), false)

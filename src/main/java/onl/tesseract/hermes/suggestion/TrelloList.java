@@ -5,6 +5,9 @@ import onl.tesseract.hermes.HermesApplication;
 
 public enum TrelloList {
     SUGGESTIONS("Suggestions"),
+    APPROVED_PENDING("Accepté & En attente"),
+    IN_DISCUSSION("En discussion (groupe de travail)"),
+    DISCUSSED("Discuté"),
     ;
     private final String name;
 
