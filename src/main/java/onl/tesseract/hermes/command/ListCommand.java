@@ -90,7 +90,8 @@ public class ListCommand implements DiscordSubCommand {
     private String getSuggestionShortInfo(final Suggestion suggestion)
     {
         return "\nTitre : " + suggestion.getTitle()
-                + " | Auteur : " + suggestion.getDiscordMember().getUser().getAsTag();
+                + " | Auteur : " + suggestion.getDiscordMember().getUser().getAsTag()
+                + " | " + suggestion.getTrelloCard().getShortUrl();
     }
 
     @Override
