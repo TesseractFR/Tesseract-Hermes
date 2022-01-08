@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class AcceptCommand extends ASpecificSuggestionCommand {
+public class AcceptCommand extends ARestrictedSuggestionCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(AcceptCommand.class);
 

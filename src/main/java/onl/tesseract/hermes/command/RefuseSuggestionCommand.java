@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class RefuseSuggestionCommand extends ASpecificSuggestionCommand {
+public class RefuseSuggestionCommand extends ARestrictedSuggestionCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(RefuseSuggestionCommand.class);
 
