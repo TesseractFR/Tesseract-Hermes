@@ -7,10 +7,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import onl.tesseract.hermes.DiscordRootCommand;
-import onl.tesseract.hermes.DiscordSubCommand;
-import onl.tesseract.hermes.Suggestion;
-import onl.tesseract.hermes.SuggestionBuilder;
+import onl.tesseract.hermes.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

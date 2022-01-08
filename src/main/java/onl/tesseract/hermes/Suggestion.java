@@ -3,7 +3,6 @@ package onl.tesseract.hermes;
 import com.julienvey.trello.domain.Card;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import onl.tesseract.hermes.command.SuggestionUtils;
 import onl.tesseract.hermes.suggestion.SuggestionApprovalType;
 import onl.tesseract.hermes.suggestion.SuggestionStatus;
 import onl.tesseract.hermes.suggestion.TrelloList;

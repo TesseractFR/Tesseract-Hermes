@@ -1,8 +1,7 @@
-package onl.tesseract.hermes.command;
+package onl.tesseract.hermes;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import onl.tesseract.hermes.Suggestion;
 import onl.tesseract.hermes.suggestion.SuggestionStatus;
 
 public class SuggestionUtils {
