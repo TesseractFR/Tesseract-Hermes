@@ -1,5 +1,6 @@
 package onl.tesseract.hermes.command;
 
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -45,6 +46,16 @@ public class RefuseSuggestionCommand extends ARestrictedSuggestionCommand {
     {
         String refusalReason = Objects.requireNonNull(event.getOption("raison")).getAsString();
         refuse(suggestion, refusalReason);
+
+        suggestion.getResponseMessage()
+                  .reply(new MessageBuilder()
+                          .append(suggestion.getDiscordMember())
+                          .append(", ta suggestion \"")
+                          .append(suggestion.getTitle())
+                          .append("\" a été refusée.")
+                          .build())
+                  .queue();
+
         event.getHook().sendMessage(":thumbsup:")
              .queue();
     }

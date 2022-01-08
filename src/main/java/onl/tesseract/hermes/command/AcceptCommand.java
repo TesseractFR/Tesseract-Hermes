@@ -1,5 +1,6 @@
 package onl.tesseract.hermes.command;
 
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -54,6 +55,16 @@ public class AcceptCommand extends ARestrictedSuggestionCommand {
 
         suggestion.accept(approvalType, message);
         logger.info("Accepted suggestion {}. Moved to {}.", suggestion.getTrelloCard().getShortLink(), approvalType.getTrelloList().getName());
+
+        suggestion.getResponseMessage()
+                  .reply(new MessageBuilder()
+                          .append(suggestion.getDiscordMember())
+                          .append(", ta suggestion \"")
+                          .append(suggestion.getTitle())
+                          .append("\" a été acceptée.")
+                          .build())
+                  .queue();
+
         event.getHook().sendMessage(":thumbsup:")
              .queue();
     }
