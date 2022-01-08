@@ -3,6 +3,7 @@ package onl.tesseract.hermes;
 import com.julienvey.trello.domain.Card;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import onl.tesseract.hermes.command.SuggestionUtils;
 import onl.tesseract.hermes.suggestion.SuggestionStatus;
 import onl.tesseract.hermes.suggestion.TrelloList;
 import org.springframework.lang.Nullable;
@@ -56,10 +57,23 @@ public final class Suggestion {
         this.trelloCard = this.trelloCard.update();
     }
 
+    public void updateDiscordMessage()
+    {
+        if (this.responseMessage == null)
+            throw new IllegalStateException("No reply message set.");
+        responseMessage.editMessageEmbeds(SuggestionUtils.computeEmbedMessage(this))
+                .queue();
+    }
+
     public void setResponseMessage(final Message responseMessage)
     {
         this.responseMessage = responseMessage;
         updateTrelloCard();
+    }
+
+    public void setStatus(final SuggestionStatus status)
+    {
+        this.status = status;
     }
 
     public SuggestionStatus getStatus()

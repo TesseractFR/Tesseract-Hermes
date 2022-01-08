@@ -2,6 +2,7 @@ package onl.tesseract.hermes;
 
 import com.julienvey.trello.Trello;
 import com.julienvey.trello.domain.Board;
+import com.julienvey.trello.domain.Card;
 import com.julienvey.trello.impl.TrelloImpl;
 import com.julienvey.trello.impl.http.ApacheHttpClient;
 import net.dv8tion.jda.api.JDA;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 
 import javax.security.auth.login.LoginException;
 import java.util.Objects;
+import java.util.Optional;
 
 @SpringBootApplication
 public class HermesApplication {
@@ -33,7 +35,8 @@ public class HermesApplication {
 
     @Bean
     public Trello trello(@Value("${trello.key}") final String key,
-                         @Value("${trello.access-token}") final String accessToken) {
+                         @Value("${trello.access-token}") final String accessToken)
+    {
         return new TrelloImpl(key, accessToken, new ApacheHttpClient());
     }
 
@@ -45,7 +48,8 @@ public class HermesApplication {
     }
 
     @Bean
-    public TextChannel suggestionChannel(@Value("${discord.channel.id}") final String suggestionChannelId, final Guild guild) {
+    public TextChannel suggestionChannel(@Value("${discord.channel.id}") final String suggestionChannelId, final Guild guild)
+    {
         return Objects.requireNonNull(guild.getTextChannelById(suggestionChannelId));
     }
 
@@ -53,21 +57,31 @@ public class HermesApplication {
     public JDA initJDA(@Value("${jda.token}") final String botToken) throws LoginException, InterruptedException
     {
         JDA jda = JDABuilder.createDefault(botToken)
-                                    .build();
+                            .build();
         jda.awaitReady();
         return jda;
     }
 
     @Bean
-    public Guild guild(final JDA jda, @Value("${discord.guild.id}") final long guildId) {
+    public Guild guild(final JDA jda, @Value("${discord.guild.id}") final long guildId)
+    {
         return jda.getGuildById(guildId);
     }
 
     @Bean
-    public CommandLineRunner registerCommands(CommandManager commandManager, JDA jda) {
+    public CommandLineRunner registerCommands(CommandManager commandManager, JDA jda)
+    {
         return args -> {
             jda.addEventListener(commandManager);
             commandManager.registerCommands();
         };
+    }
+
+    public static Optional<Card> findCardByShortLink(final String shortLink)
+    {
+        return trelloBoard.fetchCards()
+                          .stream()
+                          .filter(card -> card.getShortLink().equals(shortLink))
+                          .findAny();
     }
 }
