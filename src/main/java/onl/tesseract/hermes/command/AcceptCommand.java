@@ -1,14 +1,11 @@
 package onl.tesseract.hermes.command;
 
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import onl.tesseract.hermes.DiscordRootCommand;
-import onl.tesseract.hermes.DiscordSubCommand;
-import onl.tesseract.hermes.HermesApplication;
-import onl.tesseract.hermes.exception.SuggestionParsingException;
+import onl.tesseract.hermes.Suggestion;
 import onl.tesseract.hermes.suggestion.SuggestionApprovalType;
 import onl.tesseract.hermes.suggestion.SuggestionCardParser;
 import org.slf4j.Logger;
@@ -17,19 +14,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Component
-public class AcceptCommand implements DiscordSubCommand {
+public class AcceptCommand extends ASpecificSuggestionCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(AcceptCommand.class);
 
-    private final SuggestionCardParser suggestionCardParser;
-
     public AcceptCommand(final SuggestionCardParser suggestionCardParser)
     {
-        this.suggestionCardParser = suggestionCardParser;
+        super(suggestionCardParser);
     }
 
     @Override
@@ -45,38 +38,24 @@ public class AcceptCommand implements DiscordSubCommand {
     }
 
     @Override
-    public void execute(final SlashCommandEvent event)
+    protected Logger getLogger()
     {
-        event.deferReply().queue();
+        return logger;
+    }
 
-        String suggestionId = Objects.requireNonNull(event.getOption("suggestion")).getAsString();
+    @Override
+    protected void process(final SlashCommandEvent event, final Suggestion suggestion)
+    {
         String newStatusString = Objects.requireNonNull(event.getOption("état")).getAsString();
         OptionMapping messageOption = event.getOption("message");
 
         SuggestionApprovalType approvalType = SuggestionApprovalType.valueOf(newStatusString);
         String message = messageOption == null ? null : messageOption.getAsString();
-        HermesApplication.findCardByShortLink(suggestionId)
-                         .flatMap(card -> {
-                             try
-                             {
-                                 return Optional.of(suggestionCardParser.parse(card));
-                             }
-                             catch (SuggestionParsingException e)
-                             {
-                                 logger.warn("Failed to parse given card " + card.getShortLink());
-                                 return Optional.empty();
-                             }
-                         })
-                         .ifPresentOrElse(suggestion -> {
-                             suggestion.accept(approvalType, message);
-                             logger.info("Accepted suggestion {}. Moved to {}.", suggestion.getTrelloCard().getShortLink(), approvalType.getTrelloList().getName());
-                             event.getHook().sendMessage(":thumbsup:")
-                                  .queue();
-                         }, () -> event.getHook()
-                                       .sendMessage("Suggestion non trouvée")
-                                       .delay(10, TimeUnit.SECONDS)
-                                       .flatMap(Message::delete)
-                                       .queue());
+
+        suggestion.accept(approvalType, message);
+        logger.info("Accepted suggestion {}. Moved to {}.", suggestion.getTrelloCard().getShortLink(), approvalType.getTrelloList().getName());
+        event.getHook().sendMessage(":thumbsup:")
+             .queue();
     }
 
     @Override
