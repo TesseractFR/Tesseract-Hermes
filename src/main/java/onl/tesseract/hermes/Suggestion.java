@@ -40,11 +40,12 @@ public final class Suggestion {
     private String buildDescription()
     {
         String content = "Auteur : "
-                + discordMember.getUser().getAsTag();
+                + discordMember.getUser().getAsTag()
+                + "\nAuthorId : " + discordMember.getUser().getId();
         if (responseMessage != null)
             content += "\nRéponse : " + responseMessage.getId()
                     + "\nLien de la réponse : " + responseMessage.getJumpUrl();
-        content += "\n\n"
+        content += "\n%%\n\n"
                 + description;
         return content;
     }
