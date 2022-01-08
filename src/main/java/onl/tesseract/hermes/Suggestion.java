@@ -18,6 +18,8 @@ public final class Suggestion {
     private Card trelloCard;
     private SuggestionStatus status;
 
+    private String refusalReason;
+
     public Suggestion(String title, String description, Member discordMember,
                       Message responseMessage, Card trelloCard)
     {
@@ -65,6 +67,16 @@ public final class Suggestion {
                 .queue();
     }
 
+    public void refuse(final String reason)
+    {
+        this.refusalReason = reason;
+        setStatus(SuggestionStatus.REFUSED);
+        updateDiscordMessage();
+        getTrelloCard().setClosed(true);
+        getTrelloCard().update();
+        getTrelloCard().addComment("Refusée : " + reason);
+    }
+
     public void setResponseMessage(final Message responseMessage)
     {
         this.responseMessage = responseMessage;
@@ -105,6 +117,11 @@ public final class Suggestion {
     public Card getTrelloCard()
     {
         return trelloCard;
+    }
+
+    public String getRefusalReason()
+    {
+        return refusalReason;
     }
 
     @Override

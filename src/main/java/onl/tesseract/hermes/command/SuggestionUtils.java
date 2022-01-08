@@ -3,6 +3,7 @@ package onl.tesseract.hermes.command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import onl.tesseract.hermes.Suggestion;
+import onl.tesseract.hermes.suggestion.SuggestionStatus;
 
 public class SuggestionUtils {
 
@@ -12,8 +13,12 @@ public class SuggestionUtils {
         embedBuilder.setTitle(suggestion.getTitle())
                     .setColor(suggestion.getStatus().getColor())
                     .setFooter("Proposé par " + suggestion.getDiscordMember().getUser().getAsTag())
-                    .addField("État", suggestion.getStatus().getDesc(), false)
-                    .addField("Trello id", suggestion.getTrelloCard().getShortLink(), false)
+                    .addField("État", suggestion.getStatus().getDesc(), false);
+
+        if (suggestion.getStatus() == SuggestionStatus.REFUSED && suggestion.getRefusalReason() != null)
+            embedBuilder.addField("Raison du refus", suggestion.getRefusalReason(), false);
+
+        embedBuilder.addField("Trello id", suggestion.getTrelloCard().getShortLink(), false)
                     .addField("Trello url", suggestion.getTrelloCard().getShortUrl(), false)
                     .setDescription(suggestion.getDescription());
 

@@ -11,7 +11,6 @@ import onl.tesseract.hermes.HermesApplication;
 import onl.tesseract.hermes.Suggestion;
 import onl.tesseract.hermes.exception.SuggestionParsingException;
 import onl.tesseract.hermes.suggestion.SuggestionCardParser;
-import onl.tesseract.hermes.suggestion.SuggestionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -52,6 +51,7 @@ public class RefuseSuggestionCommand implements DiscordSubCommand {
     {
         event.deferReply().queue();
         String suggestionId = Objects.requireNonNull(event.getOption("suggestion")).getAsString();
+        String refusalReason = Objects.requireNonNull(event.getOption("raison")).getAsString();
         HermesApplication.findCardByShortLink(suggestionId)
                          .flatMap(card -> {
                              try
@@ -65,7 +65,7 @@ public class RefuseSuggestionCommand implements DiscordSubCommand {
                              }
                          })
                          .ifPresentOrElse(suggestion -> {
-                             refuse(suggestion);
+                             refuse(suggestion, refusalReason);
                              event.getHook().sendMessage(":thumbsup:")
                                   .queue();
                          }, () -> event.getHook()
@@ -76,12 +76,9 @@ public class RefuseSuggestionCommand implements DiscordSubCommand {
 
     }
 
-    private void refuse(final Suggestion suggestion)
+    private void refuse(final Suggestion suggestion, final String reason)
     {
-        suggestion.setStatus(SuggestionStatus.REFUSED);
-        suggestion.updateDiscordMessage();
-        suggestion.getTrelloCard().setClosed(true);
-        suggestion.getTrelloCard().update();
+        suggestion.refuse(reason);
         logger.info("Suggestion {} refused. Trello card closed.", suggestion.getTrelloCard().getShortLink());
     }
 
